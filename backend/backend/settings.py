@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,10 @@ INSTALLED_APPS = [
     'pet_shooter',
     'corsheaders',
     'rest_framework',
+    'channels',
 ]
+
+ASGI_APPLICATION = 'backend.asgi.application'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -125,7 +129,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:63342",
+    "http://localhost:63343",
 ]
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
