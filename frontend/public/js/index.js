@@ -1,4 +1,4 @@
-const baseUrl = 'http://127.0.0.1:8000/api/v1/'
+const baseUrl = 'http://127.0.0.1:8080/api/v1/'
 let currentPlayer = null
 
 const createPlayer = async () => {
@@ -23,7 +23,12 @@ const refreshPlayerStatus = () => {
 }
 
 const getPlayer = async () => {
-    const response = await fetch(baseUrl + 'players/get-player-name');
+    const response = await fetch(baseUrl + 'players/get-player-name', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
     return await response.json();
 }
 
