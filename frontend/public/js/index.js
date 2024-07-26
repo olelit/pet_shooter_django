@@ -11,7 +11,7 @@ const createPlayer = async () => {
         mainField.appendChild(player)
         const rgb = data.r_g_b
         player.style.borderLeft = '50px solid ' + rgb
-        setInterval(refreshPlayerStatus, 36000)
+        //setInterval(refreshPlayerStatus, 36000)
         getActivePlayers()
     }
 }
@@ -33,21 +33,46 @@ const getPlayer = async () => {
 }
 
 const getActivePlayers = () => {
-    const socket  = new WebSocket(`ws://localhost:8000/ws/players/${currentPlayer.id}/get-active-players`)
+    const stompClient = new StompJs.Client({
+        brokerURL: 'ws://localhost:8080/ws', // Убедитесь, что этот URL правильный
+        reconnectDelay: 5000, // Автоматическая попытка переподключения каждые 5 секунд
+        heartbeatIncoming: 4000, // Сердцебиение для входящих сообщений каждые 4 секунды
+        heartbeatOutgoing: 4000  // Сердцебиение для исходящих сообщений каждые 4 секунды
+    });
 
-    socket.onopen = () => {
-        console.log('WebSocket connected');
+    stompClient.onConnect = (frame) => {
+        console.log('Connected: ' + frame);
+
+        // Подписываемся на топик
+        stompClient.subscribe('/topic/get-active-players', function(message) {
+            const body = JSON.parse(message.body);
+            console.log('Received message from topic:', body);
+        });
+
+        const connectToChannel = (destination, message) => {
+            stompClient.publish({
+                destination: destination,
+
+            });
+            console.log(`Sent to ${destination}: `, message);
+        };
+
+        // Отправляем сообщение на сервер
+        connectToChannel(`/app/${currentPlayer.id}/get-active-players`);
     };
 
-    socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        console.log('Message from server:', message);
+    stompClient.onWebSocketError = (error) => {
+        console.error('Error with websocket', error);
     };
 
-    socket.onclose = () => {
-        console.log('WebSocket closed');
+    stompClient.onStompError = (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message']);
+        console.error('Additional details: ' + frame.body);
     };
-}
+
+    // Активируем клиент для подключения к WebSocket
+    stompClient.activate();
+};
 
 document.addEventListener("DOMContentLoaded", (event) => {
     createPlayer();
