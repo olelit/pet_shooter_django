@@ -1,30 +1,22 @@
 package com.pet_shooter.backendjava.controller;
 
-
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import com.pet_shooter.backendjava.dto.PlayerCoords;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class PlayerWebsocketController {
 
-    private final SimpMessagingTemplate template;
-
-    public PlayerWebsocketController(SimpMessagingTemplate template) {
-        this.template = template;
+    @MessageMapping("send-coords")
+    @SendTo("/topic/get-coords")
+    public PlayerCoords sendCoords(PlayerCoords coords) throws Exception {
+        return coords;
     }
 
-    @MessageMapping("/{userId}/get-active-players")
-    @SendTo("/topic/get-active-players")
-    public void getActivePlayers(@DestinationVariable String userId) throws Exception {
-        sendActivePlayers();
-    }
-
-    @Scheduled(fixedRate = 5000)
-    private void sendActivePlayers() throws Exception {
-        this.template.convertAndSend("/topic/get-active-players", "test");
+    @MessageMapping("new-player")
+    @SendTo("/topic/new-player")
+    public PlayerCoords newPlayer(PlayerCoords coords) throws Exception {
+        return coords;
     }
 }

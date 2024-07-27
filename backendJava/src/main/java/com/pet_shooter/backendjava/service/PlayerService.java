@@ -17,9 +17,9 @@ public class PlayerService {
 
     public Player createOrGetPlayer(String ipAddress) {
         Player existPlayer = playerRepository.findFirstByIpAddress(ipAddress);
-        if (existPlayer != null) {
-            return existPlayer;
-        }
+//        if (existPlayer != null) {
+//            return existPlayer;
+//        }
 
         long playersCount = playerRepository.count();
         Random random = new Random();
