@@ -48,12 +48,17 @@ document.addEventListener('mousemove', (event) => {
     const playerTransform = `rotate(${angle + 90}deg)`
     player.style.transform = playerTransform
     
-    //sendTransform(playerTransform, currentPlayer.name)
+    sendTransform(playerTransform, currentPlayer.name)
 });
 
 const sendCoords = (left, top, playerName) => {
     const message = JSON.stringify({ left, top, playerName });
     sendToChannel(`/app/send-coords`, message);
+}
+
+const sendTransform = (transform, playerName) => {
+    const message = JSON.stringify({ transform, playerName });
+    sendToChannel(`/app/send-transform`, message);
 }
 
 const createPlayer = () => {
@@ -87,6 +92,11 @@ const connectToWebSockets = () => {
             showAnotherPlayerMove(data)
         });
 
+        stompClient.subscribe('/topic/get-transform', function(message) {
+            const data = JSON.parse(message.body)
+            showAnotherPlayerTransform(data)
+        });
+
         stompClient.subscribe('/topic/new-player', function(message) {
             const data = JSON.parse(message.body)
             showAnotherPlayer(data)
@@ -116,34 +126,38 @@ const showAnotherPlayerMove = (data) => {
     anotherPlayer.style.top = data.top + '%'
 }
 
+const showAnotherPlayerTransform = (data) => {
+    if(data.playerName === currentPlayer.name){
+        return
+    }
+    const playerClass = '.' + data.playerName
+    const anotherPlayer = document.querySelector(playerClass)
+    anotherPlayer.style.transform = data.transform
+}
+
 const showMainPlayerOnScreen = (newPlayer) => {
-    const mainField = document.querySelector('.main_field')
-    let player = document.createElement('div')
-    player.classList.add('player', 'current_player', newPlayer.name)
-    const rgb = newPlayer.rgb
-    mainField.appendChild(player)
-    player.style.borderLeft = '25px solid transparent';
-    player.style.borderRight = '25px solid transparent';
-    player.style.borderBottom = `50px solid ${rgb}`;
-    player.style.left = Math.floor(Math.random() * 101) + '%'
-    player.style.top = Math.floor(Math.random() * 101) + '%'
+    let player = showPlayer(newPlayer.name, newPlayer.rgb)
+    player.classList.add('current_player')
 }
 
 const showAnotherPlayer = (data) => {
     if(data.playerName === currentPlayer.name){
         return
     }
-    
+    showPlayer(data.playerName, data.color)
+}
+
+const showPlayer = (name, rgb) => {
     const mainField = document.querySelector('.main_field')
     let player = document.createElement('div')
-    player.classList.add('player', data.playerName)
-    const rgb = data.color
+    player.classList.add('player', name)
     mainField.appendChild(player)
     player.style.borderLeft = '25px solid transparent';
     player.style.borderRight = '25px solid transparent';
     player.style.borderBottom = `50px solid ${rgb}`;
     player.style.left = Math.floor(Math.random() * 101) + '%'
     player.style.top = Math.floor(Math.random() * 101) + '%'
+    return player
 }
 
 const sayAboutNewPlayer = () => {
