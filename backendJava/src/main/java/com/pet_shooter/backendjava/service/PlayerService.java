@@ -4,6 +4,7 @@ import com.pet_shooter.backendjava.model.Player;
 import com.pet_shooter.backendjava.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -35,5 +36,13 @@ public class PlayerService {
         playerRepository.save(player);
 
         return player;
+    }
+
+    public List<Player> getAllPlayers(){
+        return playerRepository.findAll();
+    }
+
+    public void deletePlayer(String playerName) {
+        playerRepository.deleteByName(playerName);
     }
 }
