@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     createPlayer()
     createAnotherPlayers()  
 });
-
 document.addEventListener('keydown', (event) => {
     const player = document.querySelector('.current_player');
     let top = parseFloat(player.style.top);
@@ -18,15 +17,19 @@ document.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'w':
             top -= playerStep;
+            player.style.transform = 'rotate(0deg)';
             break;
         case 'a':
             left -= playerStep;
+            player.style.transform = 'rotate(-90deg)';
             break;
         case 's':
             top += playerStep;
+            player.style.transform = 'rotate(180deg)';
             break;
         case 'd':
             left += playerStep;
+            player.style.transform = 'rotate(90deg)';
             break;
     }
 
@@ -36,21 +39,6 @@ document.addEventListener('keydown', (event) => {
     player.style.left = `${left}%`;
     player.style.top = `${top}%`;
     sendCoords(left, top, currentPlayer.name)
-});
-
-document.addEventListener('mousemove', (event) => {
-    const player = document.querySelector('.current_player')
-    if(player){
-        const rect = player.getBoundingClientRect()
-        const playerX = rect.left + rect.width / 2
-        const playerY = rect.top + rect.height / 2
-        
-        const angle = Math.atan2(event.clientY - playerY, event.clientX - playerX) * (180 / Math.PI)
-        const playerTransform = `rotate(${angle + 90}deg)`
-        player.style.transform = playerTransform
-        
-        sendTransform(playerTransform, currentPlayer.name)
-    }
 });
 
 document.addEventListener('click', (event) => {
@@ -275,14 +263,10 @@ const showAnotherPlayer = (data) => {
 
 const showPlayer = (name, rgb) => {
     const mainField = document.querySelector('.main_field')
-    let player = document.createElement('div')
-    player.classList.add('player', name)
+    let player = document.querySelector('.player.example').cloneNode(true)
+    player.classList.remove('example')
+    player.classList.add(name)
     mainField.appendChild(player)
-    player.style.borderLeft = '25px solid transparent';
-    player.style.borderRight = '25px solid transparent';
-    player.style.borderBottom = `50px solid ${rgb}`;
-    player.style.left = Math.floor(Math.random() * 101) + '%'
-    player.style.top = Math.floor(Math.random() * 101) + '%'
     return player
 }
 
